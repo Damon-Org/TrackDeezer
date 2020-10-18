@@ -50,6 +50,8 @@ export default class TrackDeezer extends BaseModule {
         const trackList = [];
 
         playlist.tracks.data.forEach(track => trackList.push(new DeezerTrack(this._m, track)));
+        
+        this._m.emit(isPlaylist ? 'playlistPlayed' : 'albumPlayed');
 
         return trackList;
     }
