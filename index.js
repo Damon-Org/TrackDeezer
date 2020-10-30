@@ -12,7 +12,6 @@ export default class TrackDeezer extends BaseModule {
 
         this.register(TrackDeezer, {
             name: 'trackDeezer',
-            scope: 'global',
             requires: ['trackResolver']
         });
     }
@@ -42,7 +41,7 @@ export default class TrackDeezer extends BaseModule {
                 return new DeezerTrack(this._m, track);
             }
         }
-        
+
         const playlist = isPlaylist
                 ? (await this.deezer.getPlaylist(deezer.split('/playlist/')[1]))
                 : (await this.deezer.getAlbum(deezer.split('/album/')[1]));
@@ -50,10 +49,18 @@ export default class TrackDeezer extends BaseModule {
         const trackList = [];
 
         playlist.tracks.data.forEach(track => trackList.push(new DeezerTrack(this._m, track)));
-        
+
         this._m.emit(isPlaylist ? 'playlistPlayed' : 'albumPlayed');
 
         return trackList;
+    }
+
+    init() {
+        this.deezer = new DeezerAPI(this._m);
+
+        this.modules.trackResolver.registerResolver(this.name, HostNames);
+
+        return true;
     }
 
     /**
@@ -61,13 +68,5 @@ export default class TrackDeezer extends BaseModule {
      */
     resolve(url) {
         return this._resolve(url);
-    }
-
-    setup() {
-        this.deezer = new DeezerAPI(this._m);
-
-        this.modules.trackResolver.registerResolver(this.name, HostNames);
-
-        return true;
     }
 }
