@@ -38,7 +38,7 @@ export default class TrackDeezer extends BaseModule {
             if(!isPlaylistOrAlbum) {
                 const track = (await this.deezer.getTrack(deezer.split('/track/')[1]));
 
-                return new DeezerTrack(this._m, track);
+                return { type: 'song', data: new DeezerTrack(this._m, track) };
             }
         }
 
@@ -52,7 +52,7 @@ export default class TrackDeezer extends BaseModule {
 
         this._m.emit(isPlaylist ? 'playlistPlayed' : 'albumPlayed');
 
-        return trackList;
+        return { type: isPlaylist ? 'playlist' : 'album', data: trackList };
     }
 
     init() {
