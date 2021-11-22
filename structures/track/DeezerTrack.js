@@ -1,6 +1,6 @@
-import ResolvableTrack from './ResolvableTrack.js'
+import Modules from '@/src/Modules.js'
 
-export default class DeezerTrack extends ResolvableTrack {
+export default class DeezerTrack extends Modules.trackResolver.ResolvableTrack {
     /**
      * @param {Object} data Data found by the LavaLink REST APi
      */

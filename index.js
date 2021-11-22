@@ -1,6 +1,5 @@
 import BaseModule from './structures/module/BaseModule.js'
 import DeezerAPI from './structures/api/DeezerAPI.js'
-import DeezerTrack from './structures/track/DeezerTrack.js'
 import { HostNames } from './util/Constants.js'
 
 export default class TrackDeezer extends BaseModule {
@@ -12,7 +11,7 @@ export default class TrackDeezer extends BaseModule {
 
         this.register(TrackDeezer, {
             name: 'trackDeezer',
-            requires: ['trackResolver']
+            requires: [ 'trackResolver' ]
         });
     }
 
@@ -38,7 +37,7 @@ export default class TrackDeezer extends BaseModule {
             if(!isPlaylistOrAlbum) {
                 const track = (await this.deezer.getTrack(deezer.split('/track/')[1]));
 
-                return { type: 'song', data: new DeezerTrack(this._m, track) };
+                return { type: 'song', data: new this.resolvableTrack(this._m, track) };
             }
         }
 
@@ -48,15 +47,17 @@ export default class TrackDeezer extends BaseModule {
 
         const trackList = [];
 
-        playlist.tracks.data.forEach(track => trackList.push(new DeezerTrack(this._m, track)));
+        playlist.tracks.data.forEach(track => trackList.push(new this.resolvableTrack(this._m, track)));
 
         this._m.emit(isPlaylist ? 'playlistPlayed' : 'albumPlayed');
 
         return { type: isPlaylist ? 'playlist' : 'album', data: trackList };
     }
 
-    init() {
+    async init() {
         this.deezer = new DeezerAPI(this._m);
+
+        this.resolvableTrack = (await import('./structures/track/DeezerTrack.js')).default;
 
         this.modules.trackResolver.registerResolver(this.name, HostNames);
 
